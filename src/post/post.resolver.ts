@@ -1,5 +1,5 @@
-import { Author } from '@/author/author.model';
 import { PrismaService } from '@/prisma/prisma.service';
+import { User } from '@/user/user.model';
 import {
   Args,
   Mutation,
@@ -31,9 +31,9 @@ export class PostResolver {
     return this.prisma.post.findMany();
   }
 
-  @ResolveField(() => Author)
-  author(@Parent() post: Post): Promise<Partial<Author>> {
-    return this.prisma.author.findUnique({ where: { id: post.authorId } });
+  @ResolveField(() => User)
+  user(@Parent() post: Post): Promise<Partial<User>> {
+    return this.prisma.user.findUnique({ where: { id: post.userId } });
   }
 
   @Mutation(() => Post, { nullable: true })

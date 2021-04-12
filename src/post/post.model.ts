@@ -5,11 +5,17 @@ export class Post {
   @Field(() => ID)
   id: string;
 
+  @Field(() => String)
+  createdAt: Date;
+
+  @Field(() => String)
+  updatedAt: Date;
+
   @Field()
   title: string;
 
   @Field(() => Int)
   votes: number;
 
-  authorId: string;
+  userId: string;
 }

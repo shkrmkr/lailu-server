@@ -2,15 +2,17 @@ import { Post } from '@/post/post.model';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class Author {
+export class User {
   @Field(() => ID)
   id: string;
 
-  @Field({ nullable: true })
-  firstName?: string;
+  createdAt: Date;
+  updatedAt: Date;
 
-  @Field({ nullable: true })
-  lastName?: string;
+  @Field()
+  username: string;
+
+  password: string;
 
   @Field(() => [Post])
   posts: Post[];

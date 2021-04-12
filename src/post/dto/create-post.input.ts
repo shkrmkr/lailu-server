@@ -6,7 +6,7 @@ import { Post } from '../post.model';
 export class CreatePostInput implements Partial<Post> {
   @Field()
   @IsNotEmpty()
-  authorId: string;
+  userId: string;
 
   @Field()
   @IsNotEmpty()

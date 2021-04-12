@@ -4,47 +4,46 @@
 
 type Post {
   id: ID!
+  createdAt: String!
+  updatedAt: String!
   title: String!
   votes: Int!
-  author: Author!
+  user: User!
 }
 
-type Author {
+type User {
   id: ID!
-  firstName: String
-  lastName: String
+  username: String!
   posts: [Post!]!
 }
 
 type Query {
-  author(id: String!): Author!
-  authors: [Author!]!
+  me(id: String!): User!
   post(id: String!): Post
   posts: [Post!]!
 }
 
 type Mutation {
-  createAuthor(data: CreateAuthorInput!): Author!
-  updateAuthor(data: UpdateAuthorInput!): Author
+  register(data: RegisterInput!): User!
+  login(data: LoginInput!): User!
   deleteAuthor(id: String!): Boolean!
   createPost(data: CreatePostInput!): Post!
   updatePost(data: UpdatePostInput!): Post
   deletePost(id: String!): Boolean!
 }
 
-input CreateAuthorInput {
-  firstName: String
-  lastName: String
+input RegisterInput {
+  username: String!
+  password: String!
 }
 
-input UpdateAuthorInput {
-  id: ID!
-  firstName: String
-  lastName: String
+input LoginInput {
+  username: String!
+  password: String!
 }
 
 input CreatePostInput {
-  authorId: String!
+  userId: String!
   title: String!
 }
 
