@@ -16,29 +16,33 @@ import { UpdateAuthorInput } from './dto/update-author.input';
 export class AuthorResolver {
   constructor(private prisma: PrismaService) {}
 
-  @Query(() => [Author])
-  async authors(): Promise<Partial<Author>[]> {
-    return this.prisma.author.findMany();
-  }
-
-  @Query(() => Author)
-  async author(@Args('id') id: string): Promise<Partial<Author>> {
-    return this.prisma.author.findUnique({
-      where: { id },
-    });
-  }
-
-  @ResolveField(() => [Post], { name: 'posts' })
-  async getPosts(@Parent() author: Author): Promise<Post[]> {
-    const { id } = author;
-    return this.prisma.post.findMany({ where: { authorId: id } });
-  }
-
   @Mutation(() => Author)
-  async createAuthor(
+  createAuthor(
     @Args('data') data: CreateAuthorInput,
   ): Promise<Partial<Author>> {
     return this.prisma.author.create({ data });
+  }
+
+  @Query(() => Author)
+  author(@Args('id') id: string): Promise<Partial<Author>> {
+    return this.prisma.author.findUnique({ where: { id } });
+  }
+
+  @Query(() => [Author])
+  authors(): Promise<Partial<Author>[]> {
+    return this.prisma.author.findMany();
+  }
+
+  @ResolveField(() => [Post], { name: 'posts' })
+  posts(@Parent() author: Author): Promise<Post[]> {
+    return this.prisma.post.findMany({ where: { authorId: author.id } });
+  }
+
+  @Mutation(() => Author, { nullable: true })
+  updateAuthor(
+    @Args('data') { id, ...data }: UpdateAuthorInput,
+  ): Promise<Partial<Author>> {
+    return this.prisma.author.update({ where: { id }, data });
   }
 
   @Mutation(() => Boolean)
@@ -49,17 +53,5 @@ export class AuthorResolver {
     } catch (error) {
       return false;
     }
-  }
-
-  @Mutation(() => Author)
-  async updateAuthor(
-    @Args('data') { id, ...rest }: UpdateAuthorInput,
-  ): Promise<Partial<Author>> {
-    const author = await this.prisma.author.update({
-      where: { id },
-      data: rest,
-    });
-
-    return author;
   }
 }

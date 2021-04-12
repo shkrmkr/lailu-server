@@ -1,12 +1,12 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, ID, InputType } from '@nestjs/graphql';
 import { IsNotEmpty } from 'class-validator';
 import { Post } from '../post.model';
 
 @InputType()
-export class CreatePostInput implements Partial<Post> {
-  @Field()
+export class UpdatePostInput implements Partial<Post> {
+  @Field(() => ID)
   @IsNotEmpty()
-  authorId: string;
+  id: string;
 
   @Field()
   @IsNotEmpty()
