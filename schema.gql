@@ -18,7 +18,7 @@ type User {
 }
 
 type Query {
-  me(id: String!): User!
+  me: User
   post(id: String!): Post
   posts: [Post!]!
 }
@@ -26,7 +26,7 @@ type Query {
 type Mutation {
   register(data: RegisterInput!): User!
   login(data: LoginInput!): User!
-  deleteAuthor(id: String!): Boolean!
+  deleteAccount: Boolean!
   createPost(data: CreatePostInput!): Post!
   updatePost(data: UpdatePostInput!): Post
   deletePost(id: String!): Boolean!

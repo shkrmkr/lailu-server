@@ -1,6 +1,6 @@
+import { User } from '.prisma/client';
 import { Field, InputType } from '@nestjs/graphql';
 import { IsNotEmpty, MinLength } from 'class-validator';
-import { User } from '../user.model';
 
 @InputType()
 export class RegisterInput implements Partial<User> {

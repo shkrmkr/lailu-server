@@ -1,5 +1,5 @@
+import { User } from '.prisma/client';
 import { Field, InputType } from '@nestjs/graphql';
-import { User } from '../user.model';
 
 @InputType()
 export class LoginInput implements Partial<User> {

@@ -9,7 +9,6 @@ import { UserModule } from './user/user.module';
     PrismaModule,
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',
-      context: ({ req, res }) => ({ req, res }),
     }),
     UserModule,
     PostModule,

@@ -32,6 +32,7 @@ async function bootstrap() {
       },
       secret: 'super secret',
       resave: false,
+      saveUninitialized: false,
     }),
   );
 
