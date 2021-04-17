@@ -1,30 +1,41 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import argon2 from 'argon2';
-import { LoginInput } from './dto/login.input';
-import { RegisterInput } from './dto/register.input';
+import { LoginOrDeleteInput } from './dto/login-or-delete.input';
+import { SignupInput } from './dto/signup.input';
 import { User } from './user.model';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(
+  private async verifyPassword(hashed: string, plain: string): Promise<void> {
+    const isValid = await argon2.verify(hashed, plain);
+    if (!isValid) {
+      throw new BadRequestException('Incorrect credential.');
+    }
+  }
+
+  async findUser(
     where: Prisma.UserWhereUniqueInput,
-  ): Promise<Partial<User> | null> {
-    return this.prisma.user.findUnique({ where });
+  ): Promise<Omit<User, 'posts'>> {
+    const user = await this.prisma.user.findUnique({ where });
+    if (!user) {
+      throw new BadRequestException('Incorrect credential.');
+    }
+    return user;
   }
 
   async register({
     password,
     ...data
-  }: RegisterInput): Promise<Omit<User, 'posts'>> {
+  }: SignupInput): Promise<Omit<User, 'posts'>> {
     const hashedPassword = await argon2.hash(password);
     try {
       const user = await this.prisma.user.create({
@@ -38,7 +49,6 @@ export class UserService {
       if (error.code === 'P2002') {
         throw new ConflictException('Username already taken.');
       }
-
       throw new InternalServerErrorException('Something went wrong.');
     }
   }
@@ -46,20 +56,20 @@ export class UserService {
   async validateUser({
     username,
     password,
-  }: LoginInput): Promise<Omit<User, 'posts'>> {
-    const user = await this.prisma.user.findUnique({ where: { username } });
-
-    const error = new UnauthorizedException('Wrong username or password.');
-    if (!user) throw error;
-    const isPasswordValid = await argon2.verify(user.password, password);
-    if (!isPasswordValid) throw error;
-
+  }: LoginOrDeleteInput): Promise<Omit<User, 'posts'>> {
+    const user = await this.findUser({ username });
+    await this.verifyPassword(user.password, password);
     return user;
   }
 
-  async removeUser(where: Prisma.UserWhereUniqueInput): Promise<boolean> {
+  async removeUser(
+    id: Prisma.UserWhereUniqueInput['id'],
+    password: string,
+  ): Promise<boolean> {
     try {
-      await this.prisma.user.delete({ where });
+      const user = await this.findUser({ id });
+      await this.verifyPassword(user.password, password);
+      await this.prisma.user.delete({ where: { id } });
       return true;
     } catch (error) {
       return false;

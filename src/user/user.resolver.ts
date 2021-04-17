@@ -1,4 +1,4 @@
-import { MyContext } from '@/myContext.interface';
+import { AppContext } from '@/app-context.interface';
 import { Post } from '@/post/post.model';
 import { PrismaService } from '@/prisma/prisma.service';
 import {
@@ -10,8 +10,8 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { LoginInput } from './dto/login.input';
-import { RegisterInput } from './dto/register.input';
+import { LoginOrDeleteInput } from './dto/login-or-delete.input';
+import { SignupInput } from './dto/signup.input';
 import { User } from './user.model';
 import { UserService } from './user.service';
 
@@ -23,22 +23,25 @@ export class UserResolver {
   ) {}
 
   @Mutation(() => User)
-  async register(@Args('data') data: RegisterInput, @Context() ctx: MyContext) {
+  async register(@Args('data') data: SignupInput, @Context() ctx: AppContext) {
     const user = await this.userService.register(data);
     ctx.req.session.userId = user.id;
     return user;
   }
 
   @Mutation(() => User)
-  async login(@Args('data') data: LoginInput, @Context() ctx: MyContext) {
+  async login(
+    @Args('data') data: LoginOrDeleteInput,
+    @Context() ctx: AppContext,
+  ) {
     const user = await this.userService.validateUser(data);
     ctx.req.session.userId = user.id;
     return user;
   }
 
-  @Query(() => User, { nullable: true })
-  me(@Context() { req }: MyContext) {
-    return this.userService.findOne({ id: req.session.userId });
+  @Query(() => User)
+  me(@Context() { req }: AppContext) {
+    return this.userService.findUser({ id: req.session.userId });
   }
 
   @ResolveField(() => [Post], { name: 'posts' })
@@ -47,7 +50,10 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  async deleteAccount(@Context() { req }: MyContext) {
-    return this.userService.removeUser({ id: req.session.userId });
+  async deleteAccount(
+    @Context() { req }: AppContext,
+    @Args('password') password: string,
+  ) {
+    return this.userService.removeUser(req.session.userId, password);
   }
 }

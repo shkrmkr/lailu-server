@@ -3,7 +3,7 @@ import { Field, InputType } from '@nestjs/graphql';
 import { IsNotEmpty, MinLength } from 'class-validator';
 
 @InputType()
-export class RegisterInput implements Partial<User> {
+export class SignupInput implements Partial<User> {
   @Field()
   @IsNotEmpty()
   @MinLength(3)

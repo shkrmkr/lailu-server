@@ -18,26 +18,26 @@ type User {
 }
 
 type Query {
-  me: User
+  me: User!
   post(id: String!): Post
   posts: [Post!]!
 }
 
 type Mutation {
-  register(data: RegisterInput!): User!
-  login(data: LoginInput!): User!
-  deleteAccount: Boolean!
+  register(data: SignupInput!): User!
+  login(data: LoginOrDeleteInput!): User!
+  deleteAccount(password: String!): Boolean!
   createPost(data: CreatePostInput!): Post!
   updatePost(data: UpdatePostInput!): Post
   deletePost(id: String!): Boolean!
 }
 
-input RegisterInput {
+input SignupInput {
   username: String!
   password: String!
 }
 
-input LoginInput {
+input LoginOrDeleteInput {
   username: String!
   password: String!
 }
